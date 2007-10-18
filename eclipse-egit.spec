@@ -2,21 +2,21 @@
 
 Summary:          Eclipse Git plug-in
 Name:             eclipse-egit
-Version:          0.2.99
-Release:          %mkrel 0.git20070919.0.0.1
+Version:          0.3.0
+Release:          %mkrel 0.2.1
 License:          EPL GPLv2 LGPLv2
 URL:              http://repo.or.cz/w/egit.git
 Group:            Development/Java
 
-# retrieved from http://repo.or.cz/w/egit.git?a=snapshot;h=d4ad2f979b8a269612e816f63573cc76b7a067eb;sf=tgz
-Source0:          egit-d4ad2f979b8a269612e816f63573cc76b7a067eb.tar.gz
+# retrieved from http://repo.or.cz/w/egit.git?a=snapshot;h=31185033bceae1c77b0f6a4182dea3fc56f882ba;sf=tgz
+Source0:          egit-31185033bceae1c77b0f6a4182dea3fc56f882ba.tar.gz
 
 Requires:         eclipse-platform >= 1:3.2.1
-Requires:         git
+Requires:         git-core
 %if %{gcj_support}
 BuildRequires:    java-1.5.0-gcj-devel
 %else
-BuildRequires:    java-devel
+BuildRequires:    java-devel >= 1.6.0
 %endif
 
 BuildRequires:    eclipse-pde
