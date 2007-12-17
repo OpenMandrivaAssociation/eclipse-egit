@@ -26,7 +26,6 @@ BuildRequires:    java-rpmbuild >= 0:1.5
 %else
 BuildArch:        noarch
 %endif
-BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
 The eclipse-egit package contains Eclipse plugins for
