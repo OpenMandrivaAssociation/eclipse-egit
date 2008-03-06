@@ -2,15 +2,14 @@
 
 Summary:          Eclipse Git plug-in
 Name:             eclipse-egit
-Version:          0.3.0
-Release:          %mkrel 0.2.2
+Version:          0.3.1
+Release:          %mkrel 0.0.1
 License:          EPL GPLv2 LGPLv2
 URL:              http://repo.or.cz/w/egit.git
 Group:            Development/Java
 
 # retrieved from http://repo.or.cz/w/egit.git?a=snapshot;h=31185033bceae1c77b0f6a4182dea3fc56f882ba;sf=tgz
-Source0:          egit-31185033bceae1c77b0f6a4182dea3fc56f882ba.tar.gz
-
+Source0:          egit-3cd4f3f9119b79750bbfc542119451a668c462e3.tar.gz
 Requires:         eclipse-platform >= 1:3.2.1
 Requires:         git-core
 %if %{gcj_support}
@@ -66,10 +65,7 @@ install -d -m755 $RPM_BUILD_ROOT/%{_datadir}/eclipse
 # egit main feature
 unzip -q -d $RPM_BUILD_ROOT%{_datadir}/eclipse/.. \
             build/rpmBuild/org.spearce.egit.zip
-
-%if %{gcj_support}
-%{_bindir}/aot-compile-rpm
-%endif
+%aot_compile_rpm_bin
 
 %clean 
 rm -rf $RPM_BUILD_ROOT
@@ -89,8 +85,4 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/eclipse/plugins/org.spearce.egit.core*
 %{_datadir}/eclipse/plugins/org.spearce.egit.ui*
 %{_datadir}/eclipse/plugins/org.spearce.jgit*
-%if %{gcj_support}
-%dir %{_libdir}/gcj/%{name}
-%attr(-,root,root) %{_libdir}/gcj/%{name}/*
-%endif
-
+%gcj_files
