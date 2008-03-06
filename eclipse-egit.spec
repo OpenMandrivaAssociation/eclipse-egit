@@ -20,7 +20,7 @@ BuildRequires:    java-devel >= 1.6.0
 
 BuildRequires:    eclipse-pde
 BuildRequires:    java-rpmbuild >= 0:1.5
-
+BuildRequires:    zip
 %if %{gcj_support}
 %else
 BuildArch:        noarch
