@@ -1,65 +1,55 @@
-%define gcj_support     0
+%global eclipse_base     %{_libdir}/eclipse
+%global install_loc      %{_datadir}/eclipse/dropins/egit
 
 Summary:          Eclipse Git plug-in
 Name:             eclipse-egit
-Version:          0.4.0
-Release:          %mkrel 0.1.0
-License:          EPL GPLv2 LGPLv2
-URL:              http://repo.or.cz/w/egit.git
+Version:          0.11.3
+Release:          2
+License:          EPL
+URL:              http://www.eclipse.org/egit/
 Group:            Development/Java
 
-# retrieved from http://repo.or.cz/w/egit.git?a=snapshot;h=31185033bceae1c77b0f6a4182dea3fc56f882ba;sf=tgz
-Source0:          egit-90b818e596660b813b6fcf68f1e9e9b62c615130.tar.gz
-Requires:         eclipse-platform >= 1:3.2.1
-Requires:         git-core
-%if %{gcj_support}
-BuildRequires:    java-1.5.0-gcj-devel
-%else
-BuildRequires:    java-devel >= 1.6.0
-%endif
+# retrieved from http://egit.eclipse.org/w/?p=egit.git;a=snapshot;h=v0.11.3;sf=tbz2
+Source0:          egit-v0.11.3.tar.bz2
 
+BuildRequires:    java-devel >= 1.6.0
 BuildRequires:    eclipse-pde
-BuildRequires:    java-rpmbuild >= 0:1.5
-BuildRequires:    zip
-%if %{gcj_support}
-%else
+BuildRequires:    eclipse-jgit >= 0.11.3
+BuildRequires:    jpackage-utils >= 0:1.5
+Requires:         eclipse-platform >= 1:3.5.0
+Requires:         eclipse-jgit >= 0.11.3
+
 BuildArch:        noarch
-%endif
-BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root
+BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
 The eclipse-egit package contains Eclipse plugins for
 interacting with Git repositories.
 
 %prep
-%setup -q -c
+%setup -n eclipse-egit -q -c
+NR=$((`wc -l egit/org.eclipse.egit.ui/src/org/eclipse/egit/ui/internal/clone/GitCloneWizard.java | \
+            cut -d' ' -f1` - 1))
+       tail -n$NR egit/org.eclipse.egit.ui/src/org/eclipse/egit/ui/internal/clone/GitCloneWizard.java > part2.java
+echo "/*******************************************************************************" > part1.java
+cat part1.java part2.java > egit/org.eclipse.egit.ui/src/org/eclipse/egit/ui/internal/clone/GitCloneWizard.java
 
 %build
-%{_libdir}/eclipse/buildscripts/pdebuild \
-   -a "-DjavacSource=1.5 -DjavacTarget=1.5"
+%{eclipse_base}/buildscripts/pdebuild -f org.eclipse.egit -d "jgit"
 
 %install
 rm -rf $RPM_BUILD_ROOT
-installDir=$RPM_BUILD_ROOT/%{_datadir}/eclipse/dropins/egit
-install -d -m755 $installDir
+install -d -m 755 $RPM_BUILD_ROOT%{install_loc}
 
 # egit main feature
-unzip -q -d $installDir/ \
-            build/rpmBuild/org.spearce.egit.zip
-%{gcj_compile}
+unzip -q -d $RPM_BUILD_ROOT%{install_loc}/ build/rpmBuild/org.eclipse.egit.zip
 
-%clean
+%clean 
 rm -rf $RPM_BUILD_ROOT
 
-%if %{gcj_support}
-%post
-%{update_gcjdb}
-
-%postun
-%{clean_gcjdb}
-%endif
-
 %files
-%defattr(0644,root,root,0755)
-%{_datadir}/eclipse/dropins/egit
-%gcj_files
+%defattr(-,root,root,-)
+%{install_loc}
+%doc egit/LICENSE
+%doc egit/README
+
