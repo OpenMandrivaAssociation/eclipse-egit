@@ -4,7 +4,7 @@
 Summary:          Eclipse Git plug-in
 Name:             eclipse-egit
 Version:          0.11.3
-Release:          2
+Release:          4
 License:          EPL
 URL:              http://www.eclipse.org/egit/
 Group:            Development/Java
