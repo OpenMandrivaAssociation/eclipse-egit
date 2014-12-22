@@ -6,7 +6,7 @@
 
 Name:             %{?scl_prefix}eclipse-egit
 Version:          3.5.3
-Release:          1.1
+Release:          1.2
 Group:		  Development/Java
 Summary:          Eclipse Git Integration
 
