@@ -1,27 +1,26 @@
 %{?_javapackages_macros:%_javapackages_macros}
-%global install_loc      %{_datadir}/eclipse/dropins/egit
-%global version_suffix 201312181205-r
+%global version_suffix 201412180710-r
 
 %{?scl:%scl_package eclipse-egit}
 %{!?scl:%global pkg_name %{name}}
 
-Summary:          Eclipse Git Integration
 Name:             %{?scl_prefix}eclipse-egit
-Version:          3.2.0
-Release:          1.1%{?dist}
+Version:          3.5.3
+Release:          1.1
+Group:		  Development/Java
+Summary:          Eclipse Git Integration
+
 License:          EPL
 URL:              http://www.eclipse.org/egit
-
 Source0:          http://git.eclipse.org/c/egit/egit.git/snapshot/egit-%{version}.%{version_suffix}.tar.bz2
 
-BuildRequires:    java-devel >= 1.6.0
-BuildRequires:    %{?scl_prefix}eclipse-jgit >= 3.2.0
-BuildRequires:    %{?scl_prefix}jgit >= 1.3.0
 BuildRequires:    tycho
+BuildRequires:    %{?scl_prefix}eclipse-jgit >= 3.5.3-1
 BuildRequires:    %{?scl_prefix}eclipse-mylyn-context-team
 BuildRequires:    %{?scl_prefix}eclipse-mylyn-docs-wikitext
+
 Requires:         %{?scl_prefix}eclipse-platform >= 1:3.5.0
-Requires:         %{?scl_prefix}eclipse-jgit >= 3.2.0
+Requires:         %{?scl_prefix}eclipse-jgit >= 3.5.3-1
 %{?scl:Requires: %scl_runtime}
 
 BuildArch:        noarch
@@ -32,67 +31,83 @@ interacting with Git repositories.
 
 
 %package mylyn
-Summary:     Git integration for mylyn.
+Summary:     Git integration for mylyn
 Requires:    %{?scl_prefix}eclipse-mylyn-context-team
 Requires:    %{?scl_prefix}eclipse-egit = %{version}-%{release}
 Requires:    %{?scl_prefix}eclipse-mylyn-docs-wikitext
-
 
 %description mylyn
 Git integration for mylyn.
 
 %prep
-%setup -n egit-%{version}.%{version_suffix} -q
+%setup -q -n egit-%{version}.%{version_suffix}
+
 %pom_xpath_remove "pom:repositories"
 %pom_xpath_remove "pom:dependencies"
 %pom_xpath_remove "pom:profiles"
 %pom_xpath_remove "pom:build/pom:plugins/pom:plugin/pom:configuration/pom:target"
 %pom_xpath_remove "*[local-name() ='plugin' and (child::*[text()='tycho-packaging-plugin'])]"
 %pom_xpath_remove "pom:dependencies" org.eclipse.egit.doc/pom.xml
+%pom_disable_module org.eclipse.egit.repository
+%pom_disable_module org.eclipse.egit.source-feature
 %pom_disable_module org.eclipse.egit.target
 %pom_disable_module org.eclipse.egit.core.test
 %pom_disable_module org.eclipse.egit.ui.test
 %pom_disable_module org.eclipse.egit.mylyn.ui.test
 
-#TODO: revisit jgit packaging and maybe package source?
-sed -i -e "15,29d" org.eclipse.egit.repository/category.xml
-sed -i -e "9,11d" org.eclipse.egit.repository/category.xml
+# cb - temporary to avoid circular deps with mylyn
+%pom_disable_module org.eclipse.egit.doc
+sed -i '65,70d' org.eclipse.egit-feature/feature.xml
+
+%mvn_package :*mylyn* mylyn
+%mvn_package :* egit
 
 %build
-mvn-rpmbuild verify -Dmaven.test.skip=true
+%mvn_build -j -f
 
 %install
-install -d -m 755 $RPM_BUILD_ROOT%{install_loc}
-install -d -m 755 $RPM_BUILD_ROOT%{install_loc}/eclipse
-install -d -m 755 $RPM_BUILD_ROOT%{install_loc}/eclipse/features
-install -d -m 755 $RPM_BUILD_ROOT%{install_loc}/eclipse/plugins
+%mvn_install
 
-unzip -q -d $RPM_BUILD_ROOT%{install_loc}/eclipse org.eclipse.egit.repository/target/org.eclipse.egit.repository-%{version}.*-r.zip
-pushd $RPM_BUILD_ROOT%{install_loc}/eclipse/features
-  for f in * ; do
-    f_name=${f/.jar//}
-    mkdir -p $f_name
-    unzip -d $f_name $f
-    rm $f 
-  done
-popd
-rm $RPM_BUILD_ROOT%{install_loc}/eclipse/*.jar
-
-%files
-%dir %{install_loc}
-%dir %{install_loc}/eclipse
-%dir %{install_loc}/eclipse/plugins
-%dir %{install_loc}/eclipse/features
-%{install_loc}/eclipse/features/org.eclipse.egit_*
-%{install_loc}/eclipse/plugins/
-%exclude %{install_loc}/eclipse/plugins/org.eclipse.egit.mylyn.ui_*.jar
+%files -f .mfiles-egit
 %doc LICENSE README.md
 
-%files mylyn
-%{install_loc}/eclipse/features/org.eclipse.egit.mylyn_*
-%{install_loc}/eclipse/plugins/org.eclipse.egit.mylyn.ui_*.jar
+%files mylyn -f .mfiles-mylyn
+%doc LICENSE README.md
 
 %changelog
+* Fri Dec 19 2014 Alexander Kurtakov <akurtako@redhat.com> 3.5.3-1
+- Update to upstream 3.5.3 release.
+
+* Thu Dec 18 2014 Alexander Kurtakov <akurtako@redhat.com> 3.5.2-1
+- Update to upstream 3.5.2 release.
+
+* Fri Nov 07 2014 Mat Booth <mat.booth@redhat.com> - 3.5.0-2
+- Build/install with mvn_build/mvn_install
+
+* Fri Oct 03 2014 Mat Booth <mat.booth@redhat.com> - 3.5.0-1
+- Update to latest upstream release 3.5.0
+
+* Thu Jun 26 2014 Mat Booth <mat.booth@redhat.com> - 3.4.1-1
+- Update to latest upstream release 3.4.1
+
+* Fri Jun 13 2014 Roland Grunberg <rgrunber@redhat.com> - 3.4.0-1
+- Update to 3.4.0.
+
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.3.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Thu May 22 2014 Sami Wagiaalla <swagiaal@redhat.com> - 3.3.2-2
+- Fix build agains the lates o.e.jface.util.Policy.
+
+* Mon Apr 28 2014 Mat Booth <mat.booth@redhat.com> - 3.3.2-1
+- Update to 3.3.2.
+
+* Fri Mar 28 2014 Alexander Kurtakov <akurtako@redhat.com> 3.3.1-1
+- Update to 3.3.1.
+
+* Tue Mar 11 2014 Alexander Kurtakov <akurtako@redhat.com> 3.3.0-1
+- Update to 3.3.0.
+
 * Sun Dec 29 2013 Alexander Kurtakov <akurtako@redhat.com> 3.2.0-1
 - Update to 3.2.0.
 
@@ -270,3 +285,4 @@ rm $RPM_BUILD_ROOT%{install_loc}/eclipse/*.jar
 
 * Wed Aug 29 2007 Ben Konrath <bkonrath@redhat.com> 0.2.2-0.git20070826.fc8
 - Initial version
+
