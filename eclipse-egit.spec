@@ -19,8 +19,6 @@ BuildRequires:    %{?scl_prefix}eclipse-jgit >= 3.5.3-1
 BuildRequires:    %{?scl_prefix}eclipse-mylyn-context-team
 BuildRequires:    %{?scl_prefix}eclipse-mylyn-docs-wikitext
 BuildRequires:	  eclipse-license
-#temporary while using old mylyn
-BuildRequires:	  lucene3
 Requires:         %{?scl_prefix}eclipse-platform >= 1:3.5.0
 Requires:         %{?scl_prefix}eclipse-jgit >= 3.5.3-1
 %{?scl:Requires: %scl_runtime}
@@ -56,10 +54,6 @@ Git integration for mylyn.
 %pom_disable_module org.eclipse.egit.core.test
 %pom_disable_module org.eclipse.egit.ui.test
 %pom_disable_module org.eclipse.egit.mylyn.ui.test
-
-# cb - temporary to avoid circular deps with mylyn
-%pom_disable_module org.eclipse.egit.doc
-sed -i '65,70d' org.eclipse.egit-feature/feature.xml
 
 %mvn_package :*mylyn* mylyn
 %mvn_package :* egit
