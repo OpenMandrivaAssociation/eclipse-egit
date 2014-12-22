@@ -18,7 +18,7 @@ BuildRequires:    tycho
 BuildRequires:    %{?scl_prefix}eclipse-jgit >= 3.5.3-1
 BuildRequires:    %{?scl_prefix}eclipse-mylyn-context-team
 BuildRequires:    %{?scl_prefix}eclipse-mylyn-docs-wikitext
-
+BuildRequires:	  eclipse-license
 Requires:         %{?scl_prefix}eclipse-platform >= 1:3.5.0
 Requires:         %{?scl_prefix}eclipse-jgit >= 3.5.3-1
 %{?scl:Requires: %scl_runtime}
