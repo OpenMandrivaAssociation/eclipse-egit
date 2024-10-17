@@ -11,7 +11,7 @@ Group:		  Development/Java
 Summary:          Eclipse Git Integration
 
 License:          EPL
-URL:              http://www.eclipse.org/egit
+URL:              https://www.eclipse.org/egit
 Source0:          http://git.eclipse.org/c/egit/egit.git/snapshot/egit-%{version}.%{version_suffix}.tar.bz2
 
 BuildRequires:    tycho
